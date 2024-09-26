@@ -9,10 +9,10 @@ from matplotlib import pyplot as plt
 
 STARTING_TIME = time.thread_time_ns()
 
-def open_file(file_path):
+def open_file(file_path,skip):
     with open(file_path) as file:
         data = file.read()
-    return data
+    return "\n".join(data.splitlines()[int(skip):])
 
 def plot_freq(data_dict):
     plt.bar(data_dict.keys(),data_dict.values(), color = "orange")
@@ -31,9 +31,9 @@ def text_stats(file_path):
 
 def charcount(file_path,l_skip,char_numb,hist):
     char_dict = {a: 0 for a in string.ascii_lowercase}
-    data = open_file(file_path)
+    data = open_file(file_path,l_skip)
     book_lines = [line.lower() for line in data.splitlines()]
-    for line in book_lines[int(l_skip):]:
+    for line in book_lines:
         for chara in line:
             if chara in string.ascii_lowercase:
                 char_dict[chara] += 1
