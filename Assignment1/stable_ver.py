@@ -15,40 +15,23 @@ def how_much_time():
 def print_dict(_dict):
     return "".join([f"{iter[0]}: {iter[1]}\n" for iter in list(zip(_dict.keys(),_dict.values()))])
 
-def open_file(file_path):
+def open_file(file_path,skip):
+    skip = (int(skip[0]),int(skip[1]))
     with open(file_path) as file:
         data = file.read()
-    return data
-
-def skip_file(data,skip):
-    skip = (int(skip[0]),int(skip[1]))
     if (len(data.splitlines()) - skip[0]) <= 0:
         logger.error(f"skip_top cant be more then the total number of line in the text")
     if (len(data.splitlines()) - skip[1]) <= 0:
         logger.error(f"skip_bot cant be more then the total number of line in the text")
     if (skip[0] + skip[1]) >= len(data.splitlines()):
         logger.error("The total number of lines skipped cant be more the total number of line in the text")
-    logger.debug(f"Starting from line {skip[0]} and ending in line {len(data.splitlines()) -int(skip[1])}")
-    logger.info(f"Skipping {skip[0]} line(s) from the top and {skip[1]} line(s) from the bottom")
+    if skip != (0,0):
+        logger.debug(f"Starting from line {skip[0]} and ending in line {len(data.splitlines()) -int(skip[1])}")
+        logger.info(f"Skipping {skip[0]} line(s) from the top and {skip[1]} line(s) from the bottom")
     return "\n".join(data.splitlines()[int(skip[0]):len(data.splitlines()) -int(skip[1])])
 
-def gutenberg(file_path):
-    data = open_file(file_path)
-    data = data.splitlines()
-    skip = [None,None]
-    for i,line in enumerate(data):
-        if "*** START OF THE PROJECT GUTENBERG EBOOK" in line:
-          skip[0] = i
-        if "*** END OF THE PROJECT GUTENBERG EBOOK" in line:
-          skip[1] = len(data) - i
-    if skip[0] == None:
-        logger.warning("Project Gutenberg Sarting Line not found, setting skip_top to 0")
-        skip[0] = 0
-    if skip[1] == None:
-        logger.warning("Project Gutenberg Ending Line not found, setting skip_bot to 0")
-        skip[1] = 0
-    return skip
-    
+def gutemberg(file_paht):
+    pass
 
 def plot_freq(data_dict,output):
     plt.title("Character Frequencies")
@@ -77,9 +60,7 @@ def formatting_output_name(freq_type,path,skipline):
 
 def charcount(file_path,l_skip,char_numb,hist,output,file_info):
     char_dict = {a: 0 for a in string.ascii_lowercase}
-    data = open_file(file_path)
-    if l_skip != (0,0):
-        data = skip_file(data,l_skip)
+    data = open_file(file_path,l_skip)
     book_lines = [line.lower() for line in data.splitlines()]
     for line in book_lines:
         for chara in line:
@@ -109,20 +90,15 @@ if __name__ == "__main__":
     parser.add_argument("file_path",    help= "path of the selected file")
     parser.add_argument("--file-info",  action='store_true',    help= "shows total # of characters, lines and words of the text")
     parser.add_argument("--char-numb",  action='store_true',    help= "show characters total count instead of frequencies")
-    parser.add_argument('--gutenberg',  action='store_true',    help= "Detect starting and ending line of gutenberg project ebooks and automaticly skips preamble and license of the book.")
     parser.add_argument('--histogram',  action='store_true',    help= "plot a histogram of the character frequencies on screen, if you want to save it use --output NAME_FILE")
     parser.add_argument("--output" ,    default= False, help= "name of the output file, --histogram is required")
     parser.add_argument("--skip-lines", nargs= 2,   metavar=('skip_top','skip_bot'),    default= (0,0), help= "skip # of lines from the text")
     args = parser.parse_args()
     #logger.debug(args)
-    skip_lines = args.skip_lines
-    if args.gutenberg:
-        if skip_lines != (0,0):
-            logger.warning("--gutenberg option is active, --skip-lines parameter will be overwritten")
-        skip_lines = gutenberg(args.file_path)
-    if (not args.histogram and args.output):
+    if ( not args.histogram and args.output):
         logger.warning("The --histogram argument is required for the --output argument, histogram file will not be created nor displayed") 
-    charcount(args.file_path,skip_lines,args.char_numb,args.histogram,args.output,args.file_info)
+    charcount(args.file_path,args.skip_lines,args.char_numb,args.histogram,args.output,args.file_info)
     how_much_time()
 
+# Creare una funzione che autodetecta i file di guttemberg ed elimina in modo automatico preambolo e licenza
 # Argparse nargs = '?' vedere bene
