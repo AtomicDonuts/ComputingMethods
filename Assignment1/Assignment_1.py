@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 STARTING_TIME = time.thread_time()
 
 def how_much_time():
-    logger.debug(f"Its passed {round(time.thread_time() - STARTING_TIME,7)} seconds since the execution of the script")
+    logger.debug(f"It\'s passed {round(time.thread_time() - STARTING_TIME,7)} seconds since the execution of the script")
 
 def print_dict(_dict):
     return "".join([f"{iter[0]}: {iter[1]}\n" for iter in list(zip(_dict.keys(),_dict.values()))])
@@ -23,12 +23,12 @@ def open_file(file_path):
 def skip_file(data,skip):
     skip = (int(skip[0]),int(skip[1]))
     if (len(data.splitlines()) - skip[0]) <= 0:
-        logger.error(f"skip_top cant be more then the total number of line in the text")
+        logger.error(f"skip_top can\'t be more then the total number of lines in the text")
     if (len(data.splitlines()) - skip[1]) <= 0:
-        logger.error(f"skip_bot cant be more then the total number of line in the text")
+        logger.error(f"skip_bot can\'t be more then the total number of lines in the text")
     if (skip[0] + skip[1]) >= len(data.splitlines()):
-        logger.error("The total number of lines skipped cant be more the total number of line in the text")
-    logger.debug(f"Starting from line {skip[0]} and ending in line {len(data.splitlines()) -int(skip[1])}")
+        logger.error("The total number of lines skipped can\'t be more the total number of line in the text")
+    logger.debug(f"Starting from line {skip[0]} and ending at line {len(data.splitlines()) -int(skip[1])}")
     logger.info(f"Skipping {skip[0]} line(s) from the top and {skip[1]} line(s) from the bottom")
     return "\n".join(data.splitlines()[int(skip[0]):len(data.splitlines()) -int(skip[1])])
 
@@ -42,16 +42,16 @@ def gutenberg(file_path):
         if "*** END OF THE PROJECT GUTENBERG EBOOK" in line:
           skip[1] = len(data) - i
     if skip[0] == None:
-        logger.warning("Project Gutenberg Sarting Line not found, setting skip_top to 0")
+        logger.warning("Project Gutenberg starting Line not found, setting skip_top to 0")
         skip[0] = 0
     if skip[1] == None:
-        logger.warning("Project Gutenberg Ending Line not found, setting skip_bot to 0")
+        logger.warning("Project Gutenberg ending Line not found, setting skip_bot to 0")
         skip[1] = 0
     return skip
     
 
 def plot_freq(data_dict,output):
-    plt.title("Character Frequencies")
+    plt.title("Character Frequency")
     plt.bar(data_dict.keys(),data_dict.values(), color = "orange")
     if output:    
         plt.savefig(output)
@@ -89,15 +89,15 @@ def charcount(file_path,l_skip,char_numb,hist,output,file_info):
     char_dict_norm = {a: char_dict[a]/char_tot for i,a in enumerate(char_dict)}
     if char_numb:
         output_text_path = formatting_output_name("Number",file_path,l_skip)
-        logger.info(f"Printing freq...\n{print_dict(char_dict)}")
+        logger.info(f"Printing frequencies...\n{print_dict(char_dict)}")
         logger.info(f"Saving frequencies in to {output_text_path} ...")
         save_text(output_text_path,char_dict)
     else:
         output_text_path = formatting_output_name("Freq",file_path,l_skip)
-        logger.info(f"Printing freq...\n{print_dict(char_dict_norm)}")
+        logger.info(f"Printing frequencies...\n{print_dict(char_dict_norm)}")
         logger.info(f"Saving frequencies in to {output_text_path} ...")
         save_text(output_text_path,char_dict_norm)
-        logger.debug(f"The sum of all the individual freq. is {sum(char_dict_norm.values())}")
+        logger.debug(f"The sum of all the individual frequencies is {sum(char_dict_norm.values())}")
     if file_info:
         text_stats(data)
     if hist:
@@ -105,14 +105,14 @@ def charcount(file_path,l_skip,char_numb,hist,output,file_info):
     
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description= "Python Script that counts the character frequencies in a text file submitted via CLI")
+    parser = argparse.ArgumentParser(description= "Python Script that displays the characters frequencies in a text file submitted via CLI")
     parser.add_argument("file_path",    help= "path of the selected file")
-    parser.add_argument("--file-info",  action='store_true',    help= "shows total # of characters, lines and words of the text")
+    parser.add_argument("--file-info","-i",  action='store_true',    help= "shows total # of characters, lines and words in the text")
     parser.add_argument("--char-numb",  action='store_true',    help= "show characters total count instead of frequencies")
-    parser.add_argument('--gutenberg',  action='store_true',    help= "detect starting and ending line of gutenberg project ebooks and automaticly skips preamble and license of the book.")
-    parser.add_argument('--histogram',  action='store_true',    help= "plot a histogram of the character frequencies on screen, if you want to save it use --output NAME_FILE")
-    parser.add_argument("--output" , nargs= '?',    const="Histogram.pdf",  default= False, help= "name of the output file, --histogram is required")
-    parser.add_argument("--skip-lines", nargs= 2,   metavar=('SKIP_TOP','SKIP_BOT'),    default= (0,0), help= "skip # of lines from the text")
+    parser.add_argument('--gutenberg',  action='store_true',    help= "detect starting and ending line of gutenberg project ebooks and automaticly skips preamble and license of the book")
+    parser.add_argument('--histogram',  action='store_true',    help= "plot a histogram of the character frequencies on screen")
+    parser.add_argument("--output" , nargs= '?',    const="Histogram.pdf",  metavar="OUTPUT_PATH",  default= False, help= "Save the histogram in OUTPUT_PATH, default path is 'Histogram.pdf'. --histogram is required to save the output file")
+    parser.add_argument("--skip-lines", nargs= 2,   metavar=('SKIP_TOP','SKIP_BOT'),    default= (0,0), help= "skip SKIP_TOP line(s) from the top of the text and SKIP_BOT from the bottom of the text")
     args = parser.parse_args()
     logger.debug(args)
     skip_lines = args.skip_lines
@@ -121,6 +121,6 @@ if __name__ == "__main__":
             logger.warning("--gutenberg option is active, --skip-lines parameter will be overwritten")
         skip_lines = gutenberg(args.file_path)
     if (not args.histogram and args.output):
-        logger.warning("The --histogram argument is required for the --output argument, histogram file will not be created nor displayed") 
+        logger.warning(f"The --histogram argument is required for the --output argument, '{args.output}' file will not be created nor displayed") 
     charcount(args.file_path,skip_lines,args.char_numb,args.histogram,args.output,args.file_info)
     how_much_time()
