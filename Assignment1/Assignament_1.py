@@ -16,11 +16,22 @@ def print_dict(_dict):
     return "".join([f"{iter[0]}: {iter[1]}\n" for iter in list(zip(_dict.keys(),_dict.values()))])
 
 def open_file(file_path,skip):
+    skip = (int(skip[0]),int(skip[1]))
     with open(file_path) as file:
         data = file.read()
-    if skip != 0:
-        logger.info(f"Skipping {skip} line(s)")
-    return "\n".join(data.splitlines()[int(skip):])
+    if (len(data.splitlines()) - skip[0]) <= 0:
+        logger.error(f"skip_top cant be more then the total number of line in the text")
+    if (len(data.splitlines()) - skip[1]) <= 0:
+        logger.error(f"skip_bot cant be more then the total number of line in the text")
+    if (skip[0] + skip[1]) >= len(data.splitlines()):
+        logger.error("The total number of lines skipped cant be more the total number of line in the text")
+    if skip != (0,0):
+        logger.debug(f"Starting from line {skip[0]} and ending in line {len(data.splitlines()) -int(skip[1])}")
+        logger.info(f"Skipping {skip[0]} line(s) from the top and {skip[1]} line(s) from the bottom")
+    return "\n".join(data.splitlines()[int(skip[0]):len(data.splitlines()) -int(skip[1])])
+
+def gutemberg(file_paht):
+    pass
 
 def plot_freq(data_dict,output):
     plt.title("Character Frequencies")
@@ -32,30 +43,28 @@ def plot_freq(data_dict,output):
         logger.debug("Plotting on screen...")
         plt.show()
     
-def text_stats(file_path,skip):
-    data = open_file(file_path,skip)
+def text_stats(data):
     logger.info(f"This text has {len([a for a in data if a in string.ascii_letters])} characters")
     logger.info(f"This text has {len(data.splitlines())} lines")
     logger.info(f"This text has {len(data.split())} words")
     
 def save_text(text_output,file_to_write):
     with open(text_output,"+w") as save:
-        #[save.write(f"{iter[0]}: {iter[1]}\n") for iter in list(zip(file_to_write.keys(),file_to_write.values()))]
         save.write(print_dict(file_to_write))
 
 def formatting_output_name(freq_type,path,skipline):
-    if skipline:
+    if skipline != (0,0):
         return f"{freq_type}_{path[:-4]}_skip{skipline}.txt"
     else:
         return f"{freq_type}_{path[:-4]}.txt"
 
-def charcount(file_path,l_skip,char_numb,hist,output):
+def charcount(file_path,l_skip,char_numb,hist,output,file_info):
     char_dict = {a: 0 for a in string.ascii_lowercase}
     data = open_file(file_path,l_skip)
     book_lines = [line.lower() for line in data.splitlines()]
     for line in book_lines:
         for chara in line:
-            if chara in string.ascii_lowercase:
+            if chara in string.ascii_lowercase: 
                 char_dict[chara] += 1
     char_tot = sum(char_dict.values())
     char_dict_norm = {a: char_dict[a]/char_tot for i,a in enumerate(char_dict)}
@@ -70,9 +79,11 @@ def charcount(file_path,l_skip,char_numb,hist,output):
         logger.info(f"Saving frequencies in to {output_text_path} ...")
         save_text(output_text_path,char_dict_norm)
         logger.debug(f"The sum of all the individual freq. is {sum(char_dict_norm.values())}")
+    if file_info:
+        text_stats(data)
     if hist:
         plot_freq(char_dict_norm,output)
-
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description= "Python Script that counts the character frequencies in a text file submitted via CLI")
@@ -80,13 +91,14 @@ if __name__ == "__main__":
     parser.add_argument("--file-info",  action='store_true',    help= "shows total # of characters, lines and words of the text")
     parser.add_argument("--char-numb",  action='store_true',    help= "show characters total count instead of frequencies")
     parser.add_argument('--histogram',  action='store_true',    help= "plot a histogram of the character frequencies on screen, if you want to save it use --output NAME_FILE")
-    parser.add_argument("--output" ,default= False, help= "name of the output file, --histogram is required")
-    parser.add_argument("--skip-lines", default= 0, help= "skip # of lines from the text")
+    parser.add_argument("--output" ,    default= False, help= "name of the output file, --histogram is required")
+    parser.add_argument("--skip-lines", nargs= 2,   metavar=('skip_top','skip_bot'),    default= (0,0), help= "skip # of lines from the text")
     args = parser.parse_args()
-    logger.debug(args)
+    #logger.debug(args)
     if ( not args.histogram and args.output):
         logger.warning("The --histogram argument is required for the --output argument, histogram file will not be created nor displayed") 
-    charcount(args.file_path,args.skip_lines,args.char_numb,args.histogram,args.output)
-    if args.file_info:
-        text_stats(args.file_path,args.skip_lines)
+    charcount(args.file_path,args.skip_lines,args.char_numb,args.histogram,args.output,args.file_info)
     how_much_time()
+
+# Creare una funzione che autodetecta i file di guttemberg ed elimina in modo automatico preambolo e licenza
+# Argparse nargs = '?' vedere bene
