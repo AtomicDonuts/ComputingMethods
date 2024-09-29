@@ -111,10 +111,10 @@ if __name__ == "__main__":
     parser.add_argument("--char-numb",  action='store_true',    help= "show characters total count instead of frequencies")
     parser.add_argument('--gutenberg',  action='store_true',    help= "detect starting and ending line of gutenberg project ebooks and automaticly skips preamble and license of the book.")
     parser.add_argument('--histogram',  action='store_true',    help= "plot a histogram of the character frequencies on screen, if you want to save it use --output NAME_FILE")
-    parser.add_argument("--output" ,    default= False, help= "name of the output file, --histogram is required")
+    parser.add_argument("--output" , nargs= '?',    const="Histogram.pdf",  default= False, help= "name of the output file, --histogram is required")
     parser.add_argument("--skip-lines", nargs= 2,   metavar=('SKIP_TOP','SKIP_BOT'),    default= (0,0), help= "skip # of lines from the text")
     args = parser.parse_args()
-    #logger.debug(args)
+    logger.debug(args)
     skip_lines = args.skip_lines
     if args.gutenberg:
         if skip_lines != (0,0):
@@ -124,5 +124,3 @@ if __name__ == "__main__":
         logger.warning("The --histogram argument is required for the --output argument, histogram file will not be created nor displayed") 
     charcount(args.file_path,skip_lines,args.char_numb,args.histogram,args.output,args.file_info)
     how_much_time()
-
-# Argparse nargs = '?' vedere bene
