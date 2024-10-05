@@ -8,7 +8,7 @@ from scipy.interpolate import InterpolatedUnivariateSpline
 
 class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y): 
         spline = InterpolatedUnivariateSpline(x, y)
         norm = spline.integral(x.min(), x.max())
         self._x = x
@@ -27,17 +27,25 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
     def _a_cumulative(self):
         return [self._cumulative(i) for i in self._grid()]
 
-    def ppf(self):
-        # prob2 = InterpolatedUnivariateSpline(self._a_cumulative(),self._grid())
-        pass
+    def ppf(self,val):
+        prob2 = InterpolatedUnivariateSpline(self._a_cumulative(),self._grid())
+        return prob2(val)
+    
+    def _a_ppf(self):
+        return [self.ppf(y) for y in np.linspace(0., 1., 100)]
+    
+    def random(self):
+        return self.ppf(np.random.random())
 
-    def plot(self):
+    def plot_pdf(self):
         plt.scatter(self._x, self._y, color="orange")
         plt.plot(self._grid(), self(self._grid()))
 
     def plot_cumulative(self):
         plt.plot(self._grid(), [self._cumulative(i) for i in self._grid()])
-
+    
+    def plot_ppf(self):
+        plt.plot(np.linspace(0., 1., 100),self._a_ppf())
 
 def triang(x):
     """
@@ -75,13 +83,18 @@ def gauss(x, mu, sigma):
 
 
 if __name__ == "__main__":
-    data_x = np.linspace(0., 10., 5)
-    data_y = np.array([triang(i) for i in data_x])
-    # data_y = np.array([gauss(i,5,1) for i in data_x])
-    # data_y = np.gauss(data_x)
+    data_x = np.linspace(0., 10., 30)
+    #data_y = np.array([triang(i) for i in data_x])
+    #data_y = np.array([gauss(i,5,1) for i in data_x])
+    data_y = np.abs(np.cos(data_x))
     pdf = ProbabilityDensityFunction(data_x, data_y)
     logger.info(pdf.normalizzation())
-    pdf.plot()
+    pdf.plot_pdf()
     plt.show()
     pdf.plot_cumulative()
     plt.show()
+    pdf.plot_ppf()
+    plt.show()
+    plt.hist([pdf.random() for i in range(0,10000)],bins = 40)
+    plt.show()
+  
