@@ -16,9 +16,9 @@ V the signature of the constructor should be __init__(self, x, y), where
   you will use to build a spline
 - [optional] add more arguments to the constructor to control the creation
   of the spline (e.g., its order)
-- the class should be able to evaluate itself on a generic point or array of
+V the class should be able to evaluate itself on a generic point or array of
   points
-- the class should be able to calculate the probability for the random
+V the class should be able to calculate the probability for the random
   variable to be included in a generic interval
 V the class should be able to throw random numbers according to the distribution
   that it represents
