@@ -7,6 +7,8 @@ from loguru import logger
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import InterpolatedUnivariateSpline
+import discrete_functions as df
+
 
 class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
     """
@@ -18,7 +20,7 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
             y : (N,), array_like
     """
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, _w=None, _bbox=[None, None], _k=3, _ext=0, _check_finite=False):
         """
         Constructor mmodule
 
@@ -31,7 +33,8 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
         self.norm = spline.integral(x.min(), x.max())
         self._x = x
         self._y = y / self.norm
-        super().__init__(self._x, self._y)
+        super().__init__(self._x, self._y, w=_w, bbox=_bbox,
+                         k=_k, ext=_ext, check_finite=_check_finite)
 
     def _grid(self):
         """
@@ -59,13 +62,13 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
         """
         return [self._cumulative(i) for i in self._grid()]
 
-    def ppf(self,val):
+    def ppf(self, val):
         """
         return ppf of the pdf evalueted in val
         Parameters:
                 val: float
         """
-        prob2 = InterpolatedUnivariateSpline(self._a_cumulative(),self._grid())
+        prob2 = InterpolatedUnivariateSpline(self._a_cumulative(), self._grid())
         return prob2(val)
 
     def _a_ppf(self):
@@ -79,6 +82,17 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
         reutrn a pseudo-random number according to the pdf
         """
         return self.ppf(np.random.random())
+
+    def a_random(self, dim):
+        """
+        return a n-dimentional array of pseudo-random number according to the pdf
+
+        Parameters:
+                dim: int
+                    the dimention od the array
+        """
+        pino = np.random.rand(dim)
+        return pdf.ppf(pino)
 
     def plot_pdf(self):
         """
@@ -97,27 +111,7 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
         """
         plot of the cpf of the pdf
         """
-        plt.plot(np.linspace(0., 1., 100),self._a_ppf())
-
-def triang(val):
-    """
-    Funzione che calcola il valore di una funzione triangolare strettamente positiva.
-
-    Args:
-            x: Valore in input per cui calcolare la funzione.
-
-    Returns:
-            Il valore della funzione triangolare in corrispondenza di x.
-    """
-    # Condizioni per definire i tratti della funzione triangolare
-    result = 0
-    if val < 0 or val > 10:
-        result = 0
-    elif val <= 5:
-        result = val / 5
-    else:
-        result = (10 - val) / 5
-    return result
+        plt.plot(np.linspace(0., 1., 100), self._a_ppf())
 
 def gauss(val, mu_val, sigma):
     """
@@ -134,28 +128,21 @@ def gauss(val, mu_val, sigma):
 
     return (1 / (sigma * np.sqrt(2*np.pi))) * np.exp(-(val - mu_val)**2 / (2*sigma**2))
 
-def some_tests():
-    """
-    some useless tests
-    """
-    _rand_numb = np.random.random()
-    logger.debug(f"RE: {np.abs(np.abs(np.cos(_rand_numb))/pdf.norm - pdf(_rand_numb))/100.}")
-    logger.debug(f"Value of pdf in {_rand_numb}: {pdf(_rand_numb)}")
-
 if __name__ == "__main__":
     data_x = np.linspace(0., 10., 30)
-    # data_y = np.array([triang(i) for i in data_x])
+    # data_y = np.array([df.triang(i) for i in data_x])
     # data_y = np.array([gauss(i,5,1) for i in data_x])
-    data_y = np.abs(np.cos(data_x))
+    data_y = np.array([df.func(i) for i in data_x])
+    # data_y = np.abs(np.cos(data_x))
     pdf = ProbabilityDensityFunction(data_x, data_y)
     logger.info(pdf.normalizzation())
-    pdf.plot_pdf()
+    # pdf.plot_pdf()
+    # plt.show()
+    # pdf.plot_cumulative()
+    # plt.show()
+    # pdf.plot_ppf()
+    # plt.show()
+    # plt.hist([pdf.random() for i in range(0, 10000)], bins=40)
+    plt.hist(pdf.a_random(10000),bins = 40)
     plt.show()
-    pdf.plot_cumulative()
-    plt.show()
-    pdf.plot_ppf()
-    plt.show()
-    plt.hist([pdf.random() for i in range(0,10000)],bins = 40)
-    plt.show()
-    some_tests()
-    
+    # some_tests()

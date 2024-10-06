@@ -14,7 +14,7 @@ initial debug will be easier if you know exactly what to expect.)
 V the signature of the constructor should be __init__(self, x, y), where
   x and y are two numpy arrays sampling the pdf on a grid of values, that
   you will use to build a spline
-- [optional] add more arguments to the constructor to control the creation
+V [optional] add more arguments to the constructor to control the creation
   of the spline (e.g., its order)
 V the class should be able to evaluate itself on a generic point or array of
   points
