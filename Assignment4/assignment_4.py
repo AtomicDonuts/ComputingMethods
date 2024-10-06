@@ -110,13 +110,14 @@ def triang(val):
             Il valore della funzione triangolare in corrispondenza di x.
     """
     # Condizioni per definire i tratti della funzione triangolare
+    result = 0
     if val < 0 or val > 10:
-        return 0
+        result = 0
     elif val <= 5:
-        return val / 5
+        result = val / 5
     else:
-        return (10 - val) / 5
-
+        result = (10 - val) / 5
+    return result
 
 def gauss(val, mu_val, sigma):
     """
@@ -134,6 +135,9 @@ def gauss(val, mu_val, sigma):
     return (1 / (sigma * np.sqrt(2*np.pi))) * np.exp(-(val - mu_val)**2 / (2*sigma**2))
 
 def some_tests():
+    """
+    some useless tests
+    """
     _rand_numb = np.random.random()
     logger.debug(f"RE: {np.abs(np.abs(np.cos(_rand_numb))/pdf.norm - pdf(_rand_numb))/100.}")
     logger.debug(f"Value of pdf in {_rand_numb}: {pdf(_rand_numb)}")
