@@ -11,7 +11,7 @@ initial debug will be easier if you know exactly what to expect.)
 
 
 --- Specifications
-- the signature of the constructor should be __init__(self, x, y), where
+V the signature of the constructor should be __init__(self, x, y), where
   x and y are two numpy arrays sampling the pdf on a grid of values, that
   you will use to build a spline
 - [optional] add more arguments to the constructor to control the creation
@@ -20,7 +20,8 @@ initial debug will be easier if you know exactly what to expect.)
   points
 - the class should be able to calculate the probability for the random
   variable to be included in a generic interval
-- the class should be able to throw random numbers according to the distribution
+V the class should be able to throw random numbers according to the distribution
   that it represents
 - [optional] how many random numbers do you have to throw to hit the
   numerical inaccuracy of your generator?
+  
