@@ -163,3 +163,4 @@ cython_debug/
 prova.ipynb
 *.pdf
 *.txt
+*.code-workspace
