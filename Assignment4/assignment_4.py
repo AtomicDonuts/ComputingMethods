@@ -68,7 +68,8 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
         Parameters:
                 val: float
         """
-        prob2 = InterpolatedUnivariateSpline(self._a_cumulative(), self._grid())
+        prob2 = InterpolatedUnivariateSpline(
+            self._a_cumulative(), self._grid())
         return prob2(val)
 
     def _a_ppf(self):
@@ -113,6 +114,7 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
         """
         plt.plot(np.linspace(0., 1., 100), self._a_ppf())
 
+
 def gauss(val, mu_val, sigma):
     """
     Calcola il valore di una gaussiana in un punto x, con media mu e deviazione standard sigma.
@@ -127,6 +129,7 @@ def gauss(val, mu_val, sigma):
     """
 
     return (1 / (sigma * np.sqrt(2*np.pi))) * np.exp(-(val - mu_val)**2 / (2*sigma**2))
+
 
 if __name__ == "__main__":
     data_x = np.linspace(0., 10., 30)
@@ -143,5 +146,5 @@ if __name__ == "__main__":
     pdf.plot_ppf()
     plt.show()
     # plt.hist([pdf.random() for i in range(0, 10000)], bins=40)
-    plt.hist(pdf.a_random(10000),bins = 40)
+    plt.hist(pdf.a_random(10000), bins=40)
     plt.show()
