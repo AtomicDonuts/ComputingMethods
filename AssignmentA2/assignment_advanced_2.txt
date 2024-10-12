@@ -6,7 +6,7 @@ Assignment #5 (October 18, 2021)
 Write a class to handle a sequence of voltage measurements at different times.
 
 --- Specifications
-- the class name must be VoltageData
+V the class name must be VoltageData
 - the class must be initialized with two generic iterables of the same length
   holding the numerical values of times and voltages
 - alternatively the class can be initialized from a text file

@@ -10,8 +10,8 @@ STARTING_TIME = time.thread_time()
 
 
 def how_much_time():
-    logger.debug(f"It\'s passed {round(time.thread_time() - STARTING_TIME,7)} seconds since " /
-                 "the execution of the script")
+    logger.debug(
+        f"It\'s passed {round(time.thread_time() - STARTING_TIME,7)} seconds since the execution of the script")
 
 
 def print_dict(_dict):
@@ -35,8 +35,8 @@ def skip_file(data, skip):
     if (skip[0] + skip[1]) >= len(data.splitlines()):
         logger.error("The total number of lines skipped can\'t be " /
                      "more the total number of line in the text")
-    logger.debug(f"Starting from line {skip[0]} and ending at" /
-                 " line {len(data.splitlines()) -int(skip[1])}")
+    logger.debug(
+        f"Starting from line {skip[0]} and ending at line {len(data.splitlines()) -int(skip[1])}")
     logger.info(
         f"Skipping {skip[0]} line(s) from the top and {skip[1]} line(s) from the bottom")
     return "\n".join(data.splitlines()[int(skip[0]):len(data.splitlines()) - int(skip[1])])
