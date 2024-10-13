@@ -46,7 +46,15 @@ class VoltageData:
         # self._iterator = iter(self._readings)
 
     def from_path(self, file_path):
-        pass
+        tryT = []
+        tryA = []
+        with open(file_path,"r") as text_file:
+            for line in text_file:
+                x,y = line.split("\t")
+                tryT.append(float(x))
+                tryA.append(float(y))
+        self._timestamps_2 = np.float64(np.array(tryT))
+        self._adc_2 = np.float64(np.array(tryA))
 
     def __iter__(self):
         self._iterator = iter(self._readings)
@@ -100,3 +108,6 @@ if __name__ == "__main__":
     logger.info(f"{len(pino)}")
     logger.info("VoltageData is callable with prints")
     print(pino)
+    gino = VoltageData(timestamps_data, adc_data)
+    gino.from_path("voltage.txt")
+    print(gino._adc_2,gino._timestamps_2)
