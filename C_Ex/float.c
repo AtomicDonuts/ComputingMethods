@@ -18,7 +18,11 @@ int main(void){
         float b = 1.;
         double c = 1.;
         double d = 1.;
-        printf("a: %f \t b: %f \t c: %f \t: %f",a,b,c,d);
+        a += epsilon;
+        b -= epsilon;
+        c += epsilon;
+        d -= epsilon;
+        printf("a-b: %f \t a+b: %f \t c-d: %f \t c+d: %f",1/a-b,1/a+b,1/c-d,1/c+d);
 
     }
     return 0;
