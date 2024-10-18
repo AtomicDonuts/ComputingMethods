@@ -13,7 +13,7 @@ int main(void){
 
     printf("%f\n",c1);
 
-    for(double epsilon = 1.; epsilon > 1.e-20; epsilon/=10){
+    for(double epsilon = 1.; epsilon > 1.e-20; epsilon/=10.){
         float a = 1.;
         float b = 1.;
         double c = 1.;
@@ -22,8 +22,9 @@ int main(void){
         b -= epsilon;
         c += epsilon;
         d -= epsilon;
-        printf("a-b: %f \t a+b: %f \t c-d: %f \t c+d: %f",1/a-b,1/a+b,1/c-d,1/c+d);
+        printf("Epsilon: %E \t a-b: %f \t a+b: %f \t c-d: %f \t c+d: %f\n",epsilon,1./(a-b),1./(a+b),1./(c-d),1./(c+d));
 
     }
+    
     return 0;
 }
