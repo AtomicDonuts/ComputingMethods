@@ -164,4 +164,4 @@ prova.ipynb
 *.pdf
 *.txt
 *.code-workspace
-    
+*.out
