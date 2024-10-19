@@ -22,7 +22,7 @@ V the class must be iterable: at each iteration, a numpy array of two
   returned
 V the print() function must work on class instances. The output must show one
   entry (time and voltage), as well as the entry index, per line.
-? the class must also have a debug representation, printing just the values 
+V the class must also have a debug representation, printing just the values 
   row by row
 - the class must be callable, returning an interpolated value of the tension 
   at a given time

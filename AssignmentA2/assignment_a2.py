@@ -1,3 +1,4 @@
+#%% 
 from dataclasses import dataclass
 
 from loguru import logger
@@ -70,23 +71,34 @@ class VoltageData:
     def __len__(self):
         return len(self._readings)
 
+    def __repr__(self):
+        _repr = "index\t(timestamps,voltage)\n"
+        for i, lines in enumerate(self._readings):
+            # _str = _str + f"{i}\t{lines}\n"
+            _repr = _repr + f"{i}\t{(str(lines[0]),str(lines[1]))}"
+            if i < len(self._readings) - 1:
+                _repr = _repr + "\n"
+            # fix this shit with some real function^
+        return _repr
+
     def __str__(self):
         _str = "index\t(timestamps,voltage)\n"
         for i, lines in enumerate(self._readings):
             # _str = _str + f"{i}\t{lines}\n"
-            _str = _str + f"{i}\t{(str(lines[0]),str(lines[1]))}"
+            _str = _str + \
+                f"Line#: {i} Timestamp: {lines[0]}, Voltage: {lines[1]}"
             if i < len(self._readings) - 1:
                 _str = _str + "\n"
             # fix this shit with some real function^
         return _str
-
+    
     def __call__(self):
         pass
 
     def plot(self):
         pass
 
-
+# %%
 if __name__ == "__main__":
     adc_data = np.arange(0., 10., 1)
     timestamps_data = np.arange(0., 10., 1)
@@ -106,8 +118,12 @@ if __name__ == "__main__":
     logger.info(
         f"VoltageData is sliceable, this are the even index terms {pino.timestaps[0::2]}")
     logger.info(f"{len(pino)}")
+    logger.info("VoltageData is callable with reprs")
+    repr(pino)
     logger.info("VoltageData is callable with prints")
     print(pino)
     gino = VoltageData(timestamps_data, adc_data)
     gino.from_path("voltage.txt")
     print(gino._adc_2,gino._timestamps_2)
+
+# %%
