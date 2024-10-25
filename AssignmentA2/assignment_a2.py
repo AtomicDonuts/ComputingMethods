@@ -1,14 +1,15 @@
-#%% 
+# %%
 from dataclasses import dataclass
 
 from loguru import logger
 import numpy as np
+from scipy.interpolate import CubicSpline
 
 # Da correggere tutti i typo di timestamp
 
 
 @dataclass
-class Readings:
+class Reading:
 
     '''Class that rapresent some readings
     '''
@@ -16,12 +17,20 @@ class Readings:
     timestamp: float
     adc: int
 
-    def voltage(self):
-        '''Return the converted value of the adc to the physical voltage
-        '''
-        return 1.69 * self.adc + 0.420
+    _CONVERSION_SLOPE = 1.420
+    _CONVERSION_OFFSET = 0.690
 
-    # C'è un modo per tenersi sia questa cosa qui, che gli array?
+    @staticmethod
+    def _adc_to_voltage(adc):
+        """Convertion function
+        """
+        return Reading._CONVERSION_SLOPE * adc + Reading._CONVERSION_OFFSET
+
+    def voltage(self):
+        """Convert ADC counts to a physical voltage (in V) using the convertion function.
+        """
+        return self._adc_to_voltage(self.adc)
+
     def __str__(self):
         return f"Timestamp: {self.timestamp}, ADC Value: {self.adc}, Voltage: {self.voltage()}"
 
@@ -36,26 +45,28 @@ class VoltageData:
     '''
     # adc should not be exposed
 
-    def __init__(self, timestaps, adcs):
-        if len(timestaps) != len(adcs):
+    def __init__(self, timestamps, adcs):
+        if len(timestamps) != len(adcs):
             raise IndexError("timestamps and adcs must be the same lenght")
         self.adcs = np.float64(adcs)
-        self.timestaps = np.float64(timestaps)
-        self._readings = [Readings(x, y)
-                          for (x, y) in zip(self.timestaps, self.adcs)]
+        self.timestamps = np.float64(timestamps)
+        self._readings = [Reading(x, y)
+                          for (x, y) in zip(self.timestamps, self.adcs)]
         self.voltages = np.float64([_list[1] for _list in self._readings])
         # self._iterator = iter(self._readings)
 
-    def from_path(self, file_path):
+    @classmethod
+    def from_path(cls, file_path):
         tryT = []
         tryA = []
-        with open(file_path,"r") as text_file:
+        with open(file_path, "r") as text_file:
             for line in text_file:
-                x,y = line.split("\t")
+                x, y = line.split()
                 tryT.append(float(x))
-                tryA.append(float(y))
-        self._timestamps_2 = np.float64(np.array(tryT))
-        self._adc_2 = np.float64(np.array(tryA))
+                tryA.append(int(y))
+        timestamps = np.float64(np.array(tryT))
+        adc = np.float64(np.array(tryA))
+        return cls(timestamps, adc)
 
     def __iter__(self):
         self._iterator = iter(self._readings)
@@ -71,16 +82,6 @@ class VoltageData:
     def __len__(self):
         return len(self._readings)
 
-    def __repr__(self):
-        _repr = "index\t(timestamps,voltage)\n"
-        for i, lines in enumerate(self._readings):
-            # _str = _str + f"{i}\t{lines}\n"
-            _repr = _repr + f"{i}\t{(str(lines[0]),str(lines[1]))}"
-            if i < len(self._readings) - 1:
-                _repr = _repr + "\n"
-            # fix this shit with some real function^
-        return _repr
-
     def __str__(self):
         _str = "index\t(timestamps,voltage)\n"
         for i, lines in enumerate(self._readings):
@@ -89,14 +90,25 @@ class VoltageData:
                 f"Line#: {i} Timestamp: {lines[0]}, Voltage: {lines[1]}"
             if i < len(self._readings) - 1:
                 _str = _str + "\n"
-            # fix this shit with some real function^
         return _str
-    
-    def __call__(self):
-        pass
+
+    def __repr__(self):
+        _rep = ""
+        for i, lines in enumerate(self._readings):
+            _rep = _rep + \
+                f"VoltageData({i}"
+            for j in lines:
+                _rep = _rep + f",{j}"
+            _rep = _rep + ")\n"
+        return _rep
+
+    def __call__(self,value):
+        spline = CubicSpline(self.timestamps,self.adcs)
+        return spline(value)
 
     def plot(self):
         pass
+
 
 # %%
 if __name__ == "__main__":
@@ -111,19 +123,23 @@ if __name__ == "__main__":
     logger.info(f"VoltageData[3] is {gino}")
     logger.info(f"The timestamp of element 3 of VoltageData"
                 f"is {pino[3][0]} and its type is {type(pino[3][0])}")
-    logger.info(f"VoltageData.timestamps is {pino.timestaps}"
-                f"and its type is {type(pino.timestaps)}")
+    logger.info(f"VoltageData.timestamps is {pino.timestamps}"
+                f"and its type is {type(pino.timestamps)}")
     logger.info(
-        f"The third value of VoltageData.timestamp is {pino.timestaps[2]}")
+        f"The third value of VoltageData.timestamp is {pino.timestamps[2]}")
     logger.info(
-        f"VoltageData is sliceable, this are the even index terms {pino.timestaps[0::2]}")
-    logger.info(f"{len(pino)}")
+        f"VoltageData is sliceable, this are the even index terms {pino.timestamps[0::2]}")
+    logger.info(f"Lenght of VoltageData is: {len(pino)}")
     logger.info("VoltageData is callable with reprs")
-    repr(pino)
+    logger.info(repr(pino))
     logger.info("VoltageData is callable with prints")
-    print(pino)
-    gino = VoltageData(timestamps_data, adc_data)
-    gino.from_path("voltage.txt")
-    print(gino._adc_2,gino._timestamps_2)
+    logger.info(pino)
+    logger.info("VoltageData can be generated from data file")
+    gino = VoltageData.from_path("voltage.txt")
+    logger.info(gino)
+    logger.info("VoltageData is callable. VoltageData(x) return"\
+                " the interpolated value of the voltage in x")
+    logger.info(gino(3.2))
+
 
 # %%
