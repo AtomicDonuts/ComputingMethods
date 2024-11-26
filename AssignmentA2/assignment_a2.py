@@ -3,7 +3,8 @@ from dataclasses import dataclass
 
 from loguru import logger
 import numpy as np
-from scipy.interpolate import CubicSpline
+import matplotlib.pyplot as plt
+from scipy.interpolate import InterpolatedUnivariateSpline
 
 # Da correggere tutti i typo di timestamp
 
@@ -103,11 +104,17 @@ class VoltageData:
         return _rep
 
     def __call__(self,value):
-        spline = CubicSpline(self.timestamps,self.adcs)
+        spline = InterpolatedUnivariateSpline(self.timestamps, self.voltages)
         return spline(value)
 
-    def plot(self):
-        pass
+    def plot(self, axs=None,*args, **kwargs):
+        if not axs:
+            plt.scatter(self.timestamps, self.voltages, *args, **kwargs)
+            return plt.show()
+        axs.scatter(self.timestamps, self.voltages, *args, **kwargs)
+        _fig = axs.get_figure()
+        return _fig
+
 
 
 # %%
@@ -140,6 +147,13 @@ if __name__ == "__main__":
     logger.info("VoltageData is callable. VoltageData(x) return"\
                 " the interpolated value of the voltage in x")
     logger.info(gino(3.2))
-
-
- 
+    logger.info("VoltageData can be plotted using .plot(**arg,**kwarg)")
+    gino.plot(label = "pino",c = "r")
+    logger.info(".plot can also have an old pyplot.Axes in input")
+    figs,axs2 = plt.subplots(label = "gino")
+    axs2.set_xlabel("Time")
+    axs2.set_ylabel("Voltage")
+    axs2.plot(np.linspace(0, 20, 100), [gino(x)
+              for x in np.linspace(0, 20, 100)], c = "r", label = "Interpolated Value ")
+    axs2.legend()
+    fig_a = gino.plot(axs= axs2)
