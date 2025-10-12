@@ -44,23 +44,23 @@ class VoltageData:
     def __init__(self, timestamps, adcs):
         if len(timestamps) != len(adcs):
             raise IndexError("timestamps and adcs must be the same lenght")
-        self.adcs = np.float64(adcs)
-        self.timestamps = np.float64(timestamps)
+        self.adcs = np.array(adcs, dtype=float)
+        self.timestamps = np.array(timestamps, dtype=float)
         self._readings = [Reading(x, y) for (x, y) in zip(self.timestamps, self.adcs)]
-        self.voltages = np.float64([_list[1] for _list in self._readings])
+        self.voltages = np.array([_list[1] for _list in self._readings], dtype=float)
         # self._iterator = iter(self._readings)
 
     @classmethod
     def from_path(cls, file_path):
-        tryT = []
-        tryA = []
-        with open(file_path, "r") as text_file:
+        try_t = []
+        try_a = []
+        with open(file_path, "r", encoding="UTF-8") as text_file:
             for line in text_file:
                 x, y = line.split()
-                tryT.append(float(x))
-                tryA.append(int(y))
-        timestamps = np.float64(np.array(tryT))
-        adc = np.float64(np.array(tryA))
+                try_t.append(float(x))
+                try_a.append(int(y))
+        timestamps = np.array(try_t, dtype=float)
+        adc = np.array(try_a, dtype=float)
         return cls(timestamps, adc)
 
     def __iter__(self):
@@ -79,17 +79,17 @@ class VoltageData:
 
     def __str__(self):
         _str = "index\t(timestamps,voltage)\n"
-        for i, lines in enumerate(self._readings):
+        for index, lines in enumerate(self._readings):
             # _str = _str + f"{i}\t{lines}\n"
-            _str = _str + f"Line#: {i} Timestamp: {lines[0]}, Voltage: {lines[1]}"
-            if i < len(self._readings) - 1:
+            _str = _str + f"Line#: {index} Timestamp: {lines[0]}, Voltage: {lines[1]}"
+            if index < len(self._readings) - 1:
                 _str = _str + "\n"
         return _str
 
     def __repr__(self):
         _rep = ""
-        for i, lines in enumerate(self._readings):
-            _rep = _rep + f"VoltageData({i}"
+        for index, lines in enumerate(self._readings):
+            _rep = _rep + f"VoltageData({index}"
             for j in lines:
                 _rep = _rep + f",{j}"
             _rep = _rep + ")\n"
@@ -112,9 +112,6 @@ class VoltageData:
 adc_data = np.arange(0.0, 10.0, 1)
 timestamps_data = np.arange(0.0, 10.0, 1)
 pino = VoltageData(timestamps_data, adc_data)
-# %%
-pino[0]
-
 # %%
 if __name__ == "__main__":
     adc_data = np.arange(0.0, 10.0, 1)

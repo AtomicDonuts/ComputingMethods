@@ -93,7 +93,7 @@ class ProbabilityDensityFunction(InterpolatedUnivariateSpline):
                     the dimention od the array
         """
         pino = np.random.rand(dim)
-        return pdf.ppf(pino)
+        return self.ppf(pino)
 
     def plot_pdf(self):
         """
