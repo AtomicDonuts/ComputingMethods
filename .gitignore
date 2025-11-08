@@ -5,7 +5,8 @@ __pycache__/
 
 # C extensions
 *.so
-*.exe
+*.o
+
 
 # Distribution / packaging
 .Python
@@ -166,4 +167,4 @@ prova.ipynb
 *.txt
 *.code-workspace
 *.out
-HEP/Assignment_1_cpp/hello.o
+*.exe
