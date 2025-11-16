@@ -21,5 +21,9 @@ int main()
     std::cout << "Vector Pz: " << Muon.get_Pz() << std::endl;
     std::cout << "Massa Invariante: " << Muon.invariantMass() << std::endl;
     std::cout << "Momento Transverso: " << Muon.transferMoment() << std::endl;
+    FourVector Electron1(1,2,3,4);
+    FourVector Electron2(4,3,2,1);
+    std::cout << "Massa Invariante di Electron1 + Electron 2 " << (Electron1 + Electron2).invariantMass() << std::endl;
+    std::cout << "Momento Trasverso di Electron1 + Electron 2 " << (Electron1 + Electron2).transferMoment() << std::endl;
     return 0;
-}
+    }
