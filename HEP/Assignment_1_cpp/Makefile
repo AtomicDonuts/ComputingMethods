@@ -1,11 +1,11 @@
-all:app
+all:test_fourvector
 clean:
-	rm hello.o
-	rm libhello.so
-	rm app
-hello.o: hello.cpp
-	gcc -c -fPIC hello.cpp -o hello.o
-libhello.so: hello.o
-	gcc -shared -fPIC -o libhello.so hello.o
-app: libhello.so
-	g++ app.cpp -L ./ -lhello -o app.exe
+	rm fourvector.o
+	rm libfourvector.so
+	rm test_fourvector.exe
+fourvector.o: fourvector.cpp
+	gcc -c -fPIC fourvector.cpp -o fourvector.o
+libfourvector.so: fourvector.o
+	gcc -shared -fPIC -o libfourvector.so fourvector.o
+test_fourvector: libfourvector.so
+	g++ test_fourvector.cpp -L ./ -lfourvector -o test_fourvector.exe
